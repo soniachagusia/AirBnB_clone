@@ -1,71 +1,219 @@
 #!/usr/bin/python3
-"""File storage Module"""
+"""Command interpreter adapted from Cmd Module"""
+import models
+import cmd
+import shlex
+from models import storage
+import re
 import json
-from collections import OrderedDict
-from os import path
 
 
-class FileStorage:
-    """Class that defines the storage methods. It has two
-    private global attributes;
-    file_path (str): path to the JSON file
-    objects (dict): stores all objects by class"""
+class HBNBCommand(cmd.Cmd):
+    """The command line interpreter"""
 
-    __file_path = "file.json"
-    __objects = {}
+    prompt = '(hbnb) '
 
-    def all(self):
-        """Returns all instances, in dictionary format,
-        that have been stored previously"""
-        return self.__objects
+    def do_EOF(self, line):
+        """ Exit at EOF"""
+        print()
+        return True
 
-    def new(self, obj):
-        """Adds a new object to the dictionary"""
-        key = "{}.{}".format(obj.__class__.__name__, obj.id)
-        self.__objects[key] = obj
+    def do_quit(self, line):
+        """Quit command to exit the interpreter"""
+        return True
 
-    def save(self):
-        """Serializes the instance in Json format"""
-        obj_dict = OrderedDict()
-        for key, value in self.__objects.items():
-            obj_dict[key] = value.to_dict()
-        with open(self.__file_path, 'w', encoding='utf-8') as f:
-            obj_dict = OrderedDict()
-            for key, value in self.__objects.items():
-                obj_dict[key] = value.to_dict()
-            json.dump(obj_dict, f, ensure_ascii=False, indent=4)
+    def emptyline(self):
+        """Do nothing if line is empty"""
+        pass
 
-    def reload(self):
-        """Deserializes the JSON instances that had
-        been saved previously"""
-        if path.exists(self.__file_path):
-            with open(self.__file_path, 'r', encoding='utf-8') as f:
-                obj_dict = json.load(f)
-                for key, value in obj_dict.items():
-                    class_name, obj_id = key.split('.')
-                    if class_name in self.classes:
-                        obj_class = self.classes[class_name]
-                        obj_instance = obj_class(**value)
-                        self.__objects[key] = obj_instance
+    def do_create(self, line):
+        """Creates a new instance of BM, saves to JSON and prints the id """
+        if not line:
+            print("** class name missing **")
+        elif line not in storage.classes:
+            print("** class doesn't exist **")
+        else:
+            result = storage.classes[line]()
+            models.storage.save()
+            print(result.id)
+
+    def do_show(self, line):
+        """Prints string representation of instance based on name and id """
+        line = shlex.split(line)
+        if len(line) == 0:
+            print("** class name missing **")
+        elif line[0] not in storage.classes:
+            print("** class doesn't exist **")
+        elif len(line) == 1:
+            print("** instance id missing **")
+        else:
+            key = "{}.{}".format(line[0], line[1])
+            temp_dict = models.storage.all()
+            if key in temp_dict:
+                print(temp_dict[key])
+            else:
+                print("** no instance found **")
+
+    def do_destroy(self, line):
+        """Destroys an instance based on class name and id & save to JSON"""
+        line = shlex.split(line)
+        if len(line) == 0:
+            print("** class name missing **")
+        elif line[0] not in storage.classes:
+            print("** class doesn't exist **")
+        elif len(line) == 1:
+            print("** instance id missing **")
+        else:
+            key = "{}.{}".format(line[0], line[1])
+            temp_dict = models.storage.all()
+            if key in temp_dict:
+                del temp_dict[key]
+                models.storage.save()
+            else:
+                print("** no instance found **")
+
+    def do_all(self, line):
+        """Print all instances of a class (or all intances if no class)"""
+        line = shlex.split(line)
+        temp_dict = models.storage.all()
+        object_list = []
+        if len(line) == 0:
+            for key, value in temp_dict.items():
+                object_list.append(str(value))
+            print(object_list)
+        elif line[0] not in storage.classes:
+            print("** class doesn't exist **")
+        else:
+            for key, value in temp_dict.items():
+                if line[0] in key:
+                    object_list.append(str(value))
+            print(object_list)
+
+    def do_update(self, line):
+        """Update instance based on class name & id (Attribute)& save2  JSON"""
+        line = shlex.split(line)
+        if len(line) == 0:
+            print("** class name missing **")
+        elif line[0] not in storage.classes:
+            print("** class doesn't exist **")
+        elif len(line) == 1:
+            print("** instance id missing **")
+        else:
+            key = "{}.{}".format(line[0], line[1])
+            temp_dict = models.storage.all()
+            if key not in temp_dict:
+                print("** no instance found **")
+            elif len(line) == 2:
+                print("** attribute name missing **")
+            elif len(line) == 3:
+                print("** value missing **")
+            else:
+                value = temp_dict.get(key)
+                setattr(value, line[2], line[3])
+                models.storage.save()
+
+    def default(self, line):
+        """Preprocess the command before calling the do_* method."""
+        parts = line.split('.')
+        if len(parts) == 2:
+            class_name, action_with_args = (part.strip() for part in parts)
+
+            if class_name in storage.classes:
+                match = re.match(r'(\w+)\(([^,]*)(?:,(.*))?\)',
+                                 action_with_args)
+                if match and match.group(1) in ['create', 'count', 'show',
+                                                'destroy', 'update', 'all']:
+                    action, object_id, args = match.groups()
+                    object_id = object_id.strip() if object_id else ''
+                    args = args.strip() if args else ''
+
+                    # Check if the argument is a dictionary
+                    if '{' in args and '}' in args:
+                        # Replace single quotes with double quotes-dictionary
+                        args = args.replace("'", "\"")
+
+                        # Safely parse the dictionary using json.loads
+                        try:
+                            arg_dict = json.loads(args)
+                            if isinstance(arg_dict, dict):
+                                # Extract key-value pairs from the dictionary
+                                key_value_pairs = arg_dict.items()
+                                # Iterate over key-value pairs & call update
+                                saved_list = (["[[{}] [{}] [{}] [{}] [{}]]"
+                                              .format(action, class_name,
+                                               object_id, key, value) for key,
+                                               value in key_value_pairs])
+                                self.do_update_list(saved_list)
+                                # prevent the original command from executing
+                                return ""
+                            else:
+                                print("Not a valid dictionary")
+                        except json.JSONDecodeError as e:
+                            print(f"Error decoding JSON: {e}")
                     else:
-                        print(f"Warning: Class {class_name} not found")
+                        args_list = [arg.strip() for arg in args.split(',')]
+                        if action == 'update' and len(args_list) == 2:
+                            line = "{} {} {} {}".format(class_name,
+                                                        object_id,
+                                                        args_list[0],
+                                                        args_list[1])
+                            self.do_update(line)
+                        else:
+                            line = "{} {}".format(class_name, object_id)
+                            if action == 'destroy':
+                                self.do_destroy(line)
+                            elif action == 'show':
+                                self.do_show(line)
+                            elif action == 'update':
+                                self.do_update(line)
+                            elif action == 'count' and object_id == '':
+                                line = class_name
+                                self.do_count(line)
+                            elif action == 'all' and object_id == '':
+                                line = class_name
+                                self.do_all(line)
+                            elif action == 'create' and object_id == '':
+                                line = class_name
+                                self.do_create(line)
+                            else:
+                                print("***Unknown syntax: {}".format(line))
+                else:
+                    print("***Unknown syntax: {}".format(line))
+            else:
+                print("***Unknown syntax: {}".format(line))
+        else:
+            print("***Unknown syntax: {}".format(line))
 
-    @property
-    def classes(self):
-        """This returns a dictionary of valid classes and their references"""
-        from models.base_model import BaseModel
-        from models.user import User
-        from models.state import State
-        from models.city import City
-        from models.amenity import Amenity
-        from models.place import Place
-        from models.review import Review
+    def do_count(self, line):
+        """Count the instances of a class."""
+        words = line.split()
 
-        classes = {"BaseModel": BaseModel,
-                   "User": User,
-                   "State": State,
-                   "City": City,
-                   "Amenity": Amenity,
-                   "Place": Place,
-                   "Review": Review}
-        return classes
+        if not words:
+            print("** class name missing **")
+        elif words[0] not in storage.classes:
+            print("** class doesn't exist **")
+        else:
+            class_name = words[0]
+            instances = [k for k in storage.all() if k.startswith
+                         ("{}.".format(class_name))]
+            print(len(instances))
+
+    def do_update_list(self, saved_list):
+        """Helper function for updating an instance based
+        on its ID with a dictionary"""
+        for args_str in saved_list:
+            args = args_str.replace('[', '')\
+                    .replace(']', '').replace('][', ' ').split(' ')
+            if len(args) == 5:
+                # Extract elements from the sublist
+                action, class_name, object_id, key, value = args
+
+                # Create a line from the extracted elements and call do_update
+                line = "{} {} {} {}".format(class_name, object_id, key, value)
+                self.do_update(line)
+            else:
+                print("** Invalid no of elements in update argument list **")
+
+
+if __name__ == '__main__':
+    HBNBCommand().cmdloop()
