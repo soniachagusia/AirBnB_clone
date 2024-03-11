@@ -1,0 +1,27 @@
+U^M^M
+^@^@^@^@<9f><9f>íe:^G^@^@ã^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^C^@^@^@@^@^@^@s2^@^@^@d^@Z^@d^Ad^Bl^Am^AZ^A^A^@d^Ad^Cl^BZ^Bd^Ad^Cl^CZ^CG^@d^Dd^E<84>^@d^E<83>^BZ^Dd^CS^@)^Fz9BaseModel Module that all other classes will inherit fromé^@^@^@^@)^AÚ^HdatetimeNc^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^B^@^@^@@^@^@^@s0^@^@^@e^@Z^Ad^@Z^Bd^AZ^Cd^Bd^C<84>^@Z^Dd^Dd^E<84>^@Z^Ed^Fd^G<84>^@Z^Fd^Hd    <84>^@Z^Gd
+S^@)^KÚ BaseModelz^[The defined BaseModel classc^A^@^@^@^@^@^@^@^@^@^@^@^E^@^@^@^D^@^@^@O^@^@^@s<8e>^@^@^@|^Br^|^B ^@¡^@D^@]N\^B}^C}^D|^Cd^Ak^Br.t^A ^B|^D¡^A}^D|^D|^@_^Cq^L|^Cd^Bk^BrHt^A ^B|^D¡^A}^D|^D|^@_^Dq^L|^Cd^Ck^Br^Lt^E|^D<83>^A|^@_^Fq^Ln,t^Et^G ^H¡^@<83>^A|^@_^Ft^A        ¡^@|^@_^C|^@j^C|^@_^Dt
+j^K ^L|^@¡^A^A^@d^DS^@)^EzÒInitializes an instance of the class in two ways;
+        1. If the user provides kwargs &
+        2. Where no kwargs are provided.
+        ATTRIBUTES: these include id (UUID), created at and
+        updated atÚ
+created_atÚ
+updated_atÚ^BidN)^MÚ^Eitemsr^B^@^@^@Z^Mfromisoformatr^D^@^@^@r^E^@^@^@Ú^Cstrr^F^@^@^@Ú^DuuidZ^Euuid4Ú^CnowÚ^FmodelsÚ^GstorageÚ^Cnew)^EÚ^DselfÚ^DargsÚ^FkwargsÚ^CkeyÚ^Evalue©^@r^S^@^@^@ú"/AirBnB_clone/models/base_model.pyÚ^H__init__
+^@^@^@s^\^@^@^@^@^F^D^A^P^A^H^A
+^A^H^A^H^A
+^A^H^A^H^A^N^B^N^A
+^A^H^Az^RBaseModel.__init__c^A^@^@^@^@^@^@^@^@^@^@^@^A^@^@^@^B^@^@^@C^@^@^@s^X^@^@^@t^@ ^A¡^@|^@_^Bt^Cj^D ^E¡^@^A^@d^AS^@)^Bz<9a>Saves an any created instance by first ensuring
+        that time is current and then uses the storage method
+        to store the instance in JSON formatN)^Fr^B^@^@^@r
+^@^@^@r^E^@^@^@r^K^@^@^@r^L^@^@^@Ú^Dsave)^Ar^N^@^@^@r^S^@^@^@r^S^@^@^@r^T^@^@^@r^V^@^@^@ ^@^@^@s^D^@^@^@^@^D
+^Az^NBaseModel.savec^A^@^@^@^@^@^@^@^@^@^@^@^B^@^@^@^C^@^@^@C^@^@^@s8^@^@^@|^@j^@ ^A¡^@}^At^B|^@<83>^Aj^C|^Ad^A<^@|^@j^D ^E¡^@|^Ad^B<^@|^@j^F ^E¡^@|^Ad^C<^@|^AS^@)^Dz$Defines storage format of dictionaryÚ    __class__r^D^@^@^@r^E^@^@^@)^GÚ^H__dict__Ú^DcopyÚ^DtypeÚ^H__name__r^D^@^@^@Z    isoformatr^E^@^@^@)^Br^N^@^@^@Ú
+dictionaryr^S^@^@^@r^S^@^@^@r^T^@^@^@Ú^Gto_dict'^@^@^@s
+^@^@^@^@^B
+^A^N^A^N^A^N^Bz^QBaseModel.to_dictc^A^@^@^@^@^@^@^@^@^@^@^@^B^@^@^@^E^@^@^@C^@^@^@s^\^@^@^@t^@|^@<83>^Aj^A}^Ad^A ^B|^A|^@j^C|^@j^D¡^CS^@)^Bz)The string representation of any instancez^L[{}] ({}) {})^Er^Z^@^@^@r^[^@^@^@Ú^Fformatr^F^@^@^@r^X^@^@^@)^Br^N^@^@^@Ú
+class_namer^S^@^@^@r^S^@^@^@r^T^@^@^@Ú^G__str__0^@^@^@s^D^@^@^@^@^B
+^Bz^QBaseModel.__str__N)^Hr^[^@^@^@Ú
+__module__Ú^L__qualname__Ú^G__doc__r^U^@^@^@r^V^@^@^@r^]^@^@^@r ^@^@^@r^S^@^@^@r^S^@^@^@r^S^@^@^@r^T^@^@^@r^C^@^@^@^H^@^@^@s
+^@^@^@^H^A^D^A^H^V^H^G^H        r^C^@^@^@)^Er#^@^@^@r^B^@^@^@r  ^@^@^@r^K^@^@^@r^C^@^@^@r^S^@^@^@r^S^@^@^@r^S^@^@^@r^T^@^@^@Ú^H<module>^B^@^@^@s^H^@^@^@^D^A^L^A^H^A^H^C
+~                                                                                                                                                                       
+~                                                                                                             
